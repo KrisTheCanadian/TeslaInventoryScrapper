@@ -147,7 +147,7 @@ def create_email_body(new_cars):
 
         print("Adding: " + model + " " + vin + " " + price)
         body += trim + " " + vin + " " + price + "\n"
-        body += "https://www.tesla.com" + "/" + "en_CA" + "/" + model + "/" + vin + "\n\n"
+        body += "https://www.tesla.com" + "/" + "en_CA" + "/" + model + "/order/" + vin + "\n\n"
 
     return body
 
