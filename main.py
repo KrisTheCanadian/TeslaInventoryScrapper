@@ -144,8 +144,9 @@ def create_email_body(new_cars):
         vin = str(car['VIN'])
         price = str(car['PurchasePrice'])
         trim = str(car['TrimName'])
+        currency = str(car['CurrencyCode'])
 
-        print("Adding: " + model + " " + vin + " " + price)
+        print("Adding: " + model + " " + vin + "\n $" + price + " " + currency)
         body += trim + " " + vin + " " + price + "\n"
         body += "https://www.tesla.com" + "/" + "en_CA" + "/" + model + "/order/" + vin + "\n\n"
 
