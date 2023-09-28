@@ -11,7 +11,9 @@ def main():
     load_dotenv()
     print("Initializing...")
 
-    query = ('{"query":{"model":"mx","condition":"new","options":{},"arrangeby":"Price","order":"asc",'
+    model = os.environ['MODEL']
+
+    query = (f'{{"query":{{"model":"{model}","condition":"new","options":{{ }},"arrangeby":"Price","order":"asc",'
              '"market":"CA","language":"en","super_region":"north america","lng":-73.9640074,"lat":45.2067646,'
              '"zip":"J0S 1T0","range":200,"region":"QC"},"offset":0,"count":50,"outsideOffset":0,'
              '"outsideSearch":false}')
@@ -30,7 +32,7 @@ def main():
         "Sec-Fetch-Site": "same-origin",
         "Sec-Fetch-Mode": "cors",
         "Sec-Fetch-Dest": "empty",
-        "Referer": "https://www.tesla.com/en_CA/inventory/new/mx?arrangeby=relevance&zip=J0S%201T0&range=200",
+        "Referer": f"https://www.tesla.com/en_CA/inventory/new/{model}?arrangeby=relevance&zip=J0S%201T0&range=200",
         "Accept-Encoding": "gzip, deflate, br",
         "Accept-Language": "en-US,en;q=0.9",
     }
@@ -43,6 +45,11 @@ def main():
         data = response.json()
 
         cars = data['results']
+
+        # check to see if the dict have the keys 'approximate', if so, there is no cars
+        if 'approximate' in cars:
+            print("No cars found")
+            return
 
         print("Found " + str(len(cars)) + " cars")
 
@@ -75,11 +82,11 @@ def check_for_new_car(data):
     # list all the VINs of the previous data
     previous_vins = []
     for car in previous_data:
-        previous_vins.append(car['VIN'])
+        previous_vins.append(str(car['VIN']))
 
     # check if the VIN is in the previous data
     for car in data:
-        if car['VIN'] not in previous_vins:
+        if str(car['VIN']) not in previous_vins:
             new_cars.append(car)
 
     return new_cars
@@ -118,7 +125,7 @@ def send_email(new_cars):
     body = create_email_body(new_cars)
 
     msg = MIMEText(body)
-    msg['Subject'] = "New Tesla Inventory"
+    msg['Subject'] = "New Tesla Inventory Found!"
     msg['From'] = sender
     try:
         simple_email_context = ssl.create_default_context()
