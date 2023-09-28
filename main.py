@@ -10,18 +10,24 @@ import time
 
 
 def main():
-    print("Initializing...")
-
     model = os.environ['MODEL']
+    postal_code = os.environ['POSTAL_CODE']
+
+    if model is None or postal_code is None:
+        print("Missing model or postal code")
+        return
 
     query = (f'{{"query":{{"model":"{model}","condition":"new","options":{{ }},"arrangeby":"Price","order":"asc",'
              '"market":"CA","language":"en","super_region":"north america","lng":-73.9640074,"lat":45.2067646,'
-             '"zip":"J0S 1T0","range":200,"region":"QC"},"offset":0,"count":50,"outsideOffset":0,'
+             f'"zip":"{postal_code}","range":200,"region":"QC"}},"offset":0,"count":50,"outsideOffset":0,'
              '"outsideSearch":false}')
 
     url = "https://www.tesla.com/inventory/api/v1/inventory-results?query=" + query
 
     # create headers
+
+    # add an url encoded space after 3 characters
+    postal_code = postal_code[:3] + "%20" + postal_code[3:]
 
     headers = {
         "Host": "www.tesla.com",
@@ -33,7 +39,7 @@ def main():
         "Sec-Fetch-Site": "same-origin",
         "Sec-Fetch-Mode": "cors",
         "Sec-Fetch-Dest": "empty",
-        "Referer": f"https://www.tesla.com/en_CA/inventory/new/{model}?arrangeby=relevance&zip=J0S%201T0&range=200",
+        "Referer": f"https://www.tesla.com/en_CA/inventory/new/{model}?arrangeby=relevance&zip={postal_code}&range=200",
         "Accept-Encoding": "gzip, deflate, br",
         "Accept-Language": "en-US,en;q=0.9",
     }
@@ -124,15 +130,14 @@ def send_email(new_cars):
         return
 
     body = create_email_body(new_cars)
-
-    msg = MIMEText(body)
-    msg['Subject'] = "New Tesla Inventory Found!"
-    msg['From'] = sender
     try:
         simple_email_context = ssl.create_default_context()
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=simple_email_context) as server:
             server.login(sender, password)
             for receiver in receivers:
+                msg = MIMEText(body)
+                msg['Subject'] = "New Tesla Inventory Found!"
+                msg['From'] = sender
                 msg['To'] = receiver
                 print("Sending email to: " + receiver)
                 server.sendmail(sender, receiver, msg.as_string())
@@ -150,19 +155,33 @@ def create_email_body(new_cars):
     for car in new_cars:
         model = str(car['Model'])
         vin = str(car['VIN'])
-        price = str(car['PurchasePrice'])
+        price = car['PurchasePrice']
         trim = str(car['TrimName'])
         currency = str(car['CurrencyCode'])
+        try:
+            color = str(car['PAINT'][0])
+        except:
+            color = "N/A"
 
-        print("Adding: " + model + " " + vin + "\n $" + price + " " + currency)
-        body += trim + " " + vin + " " + price + "\n"
+        print("Adding: " + model + " " + vin + "\n $" + format_price(price) + " " + currency)
+        body += trim + "\n" + vin + "\n" + color + "\n$" + format_price(price) + "\n"
         body += "https://www.tesla.com" + "/" + "en_CA" + "/" + model + "/order/" + vin + "\n\n"
 
     return body
 
 
+def format_price(price):
+    return "{:,}".format(price)
+
+
 if __name__ == "__main__":
+    try:
+        time_interval = int(os.environ['TIME_INTERVAL_MIN']) * 60
+    except:
+        time_interval = 15 * 60
+
+    print("Starting Tesla Inventory Checker")
     while True:
         main()
-        random_time_offset = (60 * 15) + (5 * random())
+        random_time_offset = time_interval + (5 * random())
         time.sleep(random_time_offset)

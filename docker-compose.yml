@@ -7,6 +7,8 @@ services:
       - GOOGLE_PASSWORD=${GOOGLE_PASSWORD}
       - RECEIVER_EMAILS=${RECEIVER_EMAILS}
       - MODEL=${MODEL}
+      - POSTAL_CODE=${POSTAL_CODE}
+      - APPROXIMATE_TIME_INTERVAL_MIN=${APPROXIMATE_TIME_INTERVAL_MIN}
       - PYTHONUNBUFFERED=1
     volumes:
       - ./data.json:/app/data.json
