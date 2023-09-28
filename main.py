@@ -8,13 +8,8 @@ from random import random
 import requests
 import time
 
-from dotenv import load_dotenv
-
 
 def main():
-    # remove this
-    load_dotenv()
-
     model = os.environ['MODEL']
     postal_code = os.environ['POSTAL_CODE']
 
