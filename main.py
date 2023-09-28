@@ -8,8 +8,13 @@ from random import random
 import requests
 import time
 
+from dotenv import load_dotenv
+
 
 def main():
+    # remove this
+    load_dotenv()
+
     model = os.environ['MODEL']
     postal_code = os.environ['POSTAL_CODE']
 
@@ -163,7 +168,7 @@ def create_email_body(new_cars):
         except:
             color = "N/A"
 
-        print("Adding: " + model + " " + vin + "\n $" + format_price(price) + " " + currency)
+        print("Adding: " + model + " " + vin + " $" + format_price(price) + " " + currency)
         body += trim + "\n" + vin + "\n" + color + "\n$" + format_price(price) + "\n"
         body += "https://www.tesla.com" + "/" + "en_CA" + "/" + model + "/order/" + vin + "\n\n"
 
