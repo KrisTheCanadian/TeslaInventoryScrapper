@@ -1,0 +1,12 @@
+version: '3'
+services:
+  scraper:
+    build: .
+    environment:
+      - GOOGLE_EMAIL=${GOOGLE_EMAIL}
+      - GOOGLE_PASSWORD=${GOOGLE_PASSWORD}
+      - RECEIVER_EMAILS=${RECEIVER_EMAILS}
+      - MODEL=${MODEL}
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./data.json:/app/data.json

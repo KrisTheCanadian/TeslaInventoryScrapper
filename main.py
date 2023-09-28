@@ -5,13 +5,11 @@ import ssl
 from email.mime.text import MIMEText
 from random import random
 
-from dotenv import load_dotenv
 import requests
 import time
 
 
 def main():
-    load_dotenv()
     print("Initializing...")
 
     model = os.environ['MODEL']
