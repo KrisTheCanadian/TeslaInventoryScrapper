@@ -3,8 +3,11 @@ import os
 import smtplib
 import ssl
 from email.mime.text import MIMEText
+from random import random
+
 from dotenv import load_dotenv
 import requests
+import time
 
 
 def main():
@@ -161,4 +164,7 @@ def create_email_body(new_cars):
 
 
 if __name__ == "__main__":
-    main()
+    while True:
+        main()
+        random_time_offset = (60 * 15) + (5 * random())
+        time.sleep(random_time_offset)
